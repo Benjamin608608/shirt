@@ -27,9 +27,23 @@ export default function WardrobeScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.count}>共 {garments.length} 件</Text>
-        <TouchableOpacity onPress={handleLogout}>
-          <Text style={styles.logout}>登出</Text>
-        </TouchableOpacity>
+        <View style={styles.headerButtons}>
+          <TouchableOpacity
+            style={styles.headerButton}
+            onPress={() => navigation.navigate('ProfilePhoto')}
+          >
+            <Text style={styles.headerButtonText}>個人照片</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.headerButton}
+            onPress={() => navigation.navigate('TryOnHistory')}
+          >
+            <Text style={styles.headerButtonText}>試穿記錄</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleLogout}>
+            <Text style={styles.logout}>登出</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <FlatList
@@ -70,7 +84,10 @@ export default function WardrobeScreen() {
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <View style={styles.cardWrapper}>
-              <GarmentCard garment={item} />
+              <GarmentCard
+                garment={item}
+                onTryOn={(garment) => navigation.navigate('TryOn', { garment })}
+              />
             </View>
           )}
           refreshControl={
@@ -104,6 +121,22 @@ const styles = StyleSheet.create({
   count: {
     color: theme.colors.textSecondary,
     fontSize: theme.typography.caption.fontSize,
+  },
+  headerButtons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
+  },
+  headerButton: {
+    backgroundColor: theme.colors.surface,
+    paddingHorizontal: theme.spacing.sm,
+    paddingVertical: theme.spacing.xs,
+    borderRadius: theme.borderRadius.sm,
+  },
+  headerButtonText: {
+    color: theme.colors.primary,
+    fontSize: theme.typography.small.fontSize,
+    fontWeight: '600',
   },
   logout: {
     color: theme.colors.primary,

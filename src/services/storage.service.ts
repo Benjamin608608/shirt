@@ -52,4 +52,44 @@ export class StorageService {
 
     if (error) throw error;
   }
+
+  // 上傳到自定義 bucket
+  static async uploadToCustomBucket(
+    uri: string,
+    userId: string,
+    bucketName: string,
+    filename: string,
+    upsert: boolean = false
+  ): Promise<string> {
+    const compressedUri = await this.compressImage(uri);
+
+    const response = await fetch(compressedUri);
+    const blob = await response.blob();
+    const arrayBuffer = await blob.arrayBuffer();
+
+    const filePath = `${userId}/${filename}`;
+
+    const { data, error } = await supabase.storage
+      .from(bucketName)
+      .upload(filePath, arrayBuffer, {
+        contentType: 'image/jpeg',
+        upsert,
+      });
+
+    if (error) throw error;
+    return data.path;
+  }
+
+  // 從自定義 bucket 獲取圖片 URL
+  static async getImageUrlFromBucket(
+    bucketName: string,
+    imagePath: string
+  ): Promise<string> {
+    const { data, error } = await supabase.storage
+      .from(bucketName)
+      .createSignedUrl(imagePath, 3600);
+
+    if (error) throw error;
+    return data.signedUrl;
+  }
 }

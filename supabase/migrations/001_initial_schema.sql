@@ -24,6 +24,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS update_garments_updated_at ON public.garments;
 CREATE TRIGGER update_garments_updated_at
     BEFORE UPDATE ON public.garments
     FOR EACH ROW
@@ -39,18 +40,21 @@ ALTER TABLE public.garments ENABLE ROW LEVEL SECURITY;
 -- ============================================
 
 -- 使用者只能讀取自己的衣服
+DROP POLICY IF EXISTS "Users can view own garments" ON public.garments;
 CREATE POLICY "Users can view own garments"
     ON public.garments
     FOR SELECT
     USING (auth.uid() = user_id);
 
 -- 使用者只能新增自己的衣服
+DROP POLICY IF EXISTS "Users can insert own garments" ON public.garments;
 CREATE POLICY "Users can insert own garments"
     ON public.garments
     FOR INSERT
     WITH CHECK (auth.uid() = user_id);
 
 -- 使用者只能更新自己的衣服
+DROP POLICY IF EXISTS "Users can update own garments" ON public.garments;
 CREATE POLICY "Users can update own garments"
     ON public.garments
     FOR UPDATE
@@ -58,6 +62,7 @@ CREATE POLICY "Users can update own garments"
     WITH CHECK (auth.uid() = user_id);
 
 -- 使用者只能刪除自己的衣服
+DROP POLICY IF EXISTS "Users can delete own garments" ON public.garments;
 CREATE POLICY "Users can delete own garments"
     ON public.garments
     FOR DELETE

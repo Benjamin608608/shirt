@@ -7,9 +7,10 @@ import { theme } from '../styles/theme';
 interface Props {
   garment: Garment;
   onPress?: () => void;
+  onTryOn?: (garment: Garment) => void;
 }
 
-export default function GarmentCard({ garment, onPress }: Props) {
+export default function GarmentCard({ garment, onPress, onTryOn }: Props) {
   const [imageUrl, setImageUrl] = useState<string>('');
 
   useEffect(() => {
@@ -18,6 +19,11 @@ export default function GarmentCard({ garment, onPress }: Props) {
       .catch(console.error);
   }, [garment.image_key]);
 
+  const handleTryOn = (e: any) => {
+    e.stopPropagation();
+    onTryOn?.(garment);
+  };
+
   return (
     <TouchableOpacity style={styles.container} onPress={onPress}>
       {imageUrl ? (
@@ -25,9 +31,16 @@ export default function GarmentCard({ garment, onPress }: Props) {
       ) : (
         <View style={styles.placeholder} />
       )}
-      <Text style={styles.category}>
-        {CATEGORY_LABELS[garment.category as keyof typeof CATEGORY_LABELS]}
-      </Text>
+      <View style={styles.footer}>
+        <Text style={styles.category}>
+          {CATEGORY_LABELS[garment.category as keyof typeof CATEGORY_LABELS]}
+        </Text>
+        {onTryOn && (
+          <TouchableOpacity style={styles.tryOnButton} onPress={handleTryOn}>
+            <Text style={styles.tryOnButtonText}>試穿</Text>
+          </TouchableOpacity>
+        )}
+      </View>
     </TouchableOpacity>
   );
 }
@@ -48,9 +61,26 @@ const styles = StyleSheet.create({
     aspectRatio: 3 / 4,
     backgroundColor: theme.colors.surfaceHover,
   },
-  category: {
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     padding: theme.spacing.sm,
+  },
+  category: {
     color: theme.colors.text,
     fontSize: theme.typography.caption.fontSize,
+    flex: 1,
+  },
+  tryOnButton: {
+    backgroundColor: theme.colors.primary,
+    paddingHorizontal: theme.spacing.sm,
+    paddingVertical: theme.spacing.xs,
+    borderRadius: theme.borderRadius.sm,
+  },
+  tryOnButtonText: {
+    color: theme.colors.text,
+    fontSize: theme.typography.small.fontSize,
+    fontWeight: '600',
   },
 });
